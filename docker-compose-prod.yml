@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./src/backend
+    command: |
+      bash -c 'uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8000'
+    volumes:
+      - ./src/backend:/usr/src/backend/
+    ports:
+      - 8002:8000
+    environment:
+      - DATABASE_URL=postgresql://postgres:5hr4XAWBc0TZY1znwPkKVJPjJW1be6mGu56L614k5HH5SKAg0Q7Er8Qq2HPr2OMl@194.118.246.247:9999/postgres
+ 
