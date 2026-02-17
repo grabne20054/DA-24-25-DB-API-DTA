@@ -1,9 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from crud import crud
 from uuid import UUID
+from api.check_req_type import allow_get_only
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(allow_get_only)])
 
 @router.post("/categoriesProducts/{categoryId}/{productId}", status_code=201)
 async def create_categoriesProducts(categoryId: UUID, productId: UUID):

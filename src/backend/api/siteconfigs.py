@@ -1,11 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from api.model import SiteConfig, SiteConfigDB
 from crud import crud
 from uuid import UUID
+from api.check_req_type import allow_get_only
 
-
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(allow_get_only)])
 
 @router.post("/siteconfigs/", response_model=SiteConfigDB, status_code=201)
 async def create_siteconfig(payload: SiteConfig):

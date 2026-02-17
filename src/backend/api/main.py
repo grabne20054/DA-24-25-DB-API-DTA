@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from db.session import metadata, engine
 
-from api import employees, siteconfigs, addresses, customers, orders, products, routes, categories, invoices, carts, categoriesProducts, ordersProducts, cartsProducts, routesOrders
+from api import employees, siteconfigs, addresses, customers, orders, products, routes, categories, invoices, carts, categoriesProducts, ordersProducts, cartsProducts, routesOrders, roles
 
 
 metadata.create_all(engine)
@@ -33,6 +33,5 @@ app.include_router(carts.router)
 app.include_router(categoriesProducts.router)
 app.include_router(ordersProducts.router)
 app.include_router(cartsProducts.router)
+app.include_router(roles.router)
 app.include_router(routesOrders.router)
-
-

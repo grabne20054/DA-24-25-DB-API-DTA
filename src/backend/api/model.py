@@ -37,7 +37,7 @@ class Employee(BaseModel):
     lastName: str
     password: str
     email: str
-    role: Role
+    roleId : uuid.UUID
     deleted: bool
 
 
@@ -157,3 +157,11 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
+
+class Role(BaseModel):
+    name: str
+    description: str
+    deleted: bool
+
+class RoleDB(Role):
+    id: uuid.UUID

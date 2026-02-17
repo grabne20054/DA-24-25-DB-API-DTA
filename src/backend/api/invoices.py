@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from crud import crud
 from api.model import Invoice, InvoiceDB
 from uuid import UUID
+from api.check_req_type import allow_get_only
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(allow_get_only)])
 
 @router.post("/invoices/", response_model=InvoiceDB, status_code=201)
 async def create_invoice(payload: Invoice):

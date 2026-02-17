@@ -1,13 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from api.model import Employee, EmployeeDB
 from crud import crud
 from uuid import UUID
-
+from api.check_req_type import allow_get_only
 
 router = APIRouter()
 
-@router.post("/employess/", response_model=EmployeeDB, status_code=201)
+@router.post("/employees/", response_model=EmployeeDB, status_code=201)
 async def create_employee(payload: Employee):
     employee_id = crud.create_employee(payload)
 
@@ -17,7 +17,7 @@ async def create_employee(payload: Employee):
         "lastName": payload.lastName,
         "password": payload.password,
         "email": payload.email,
-        "role": payload.role,
+        "roleId": payload.roleId,
         "deleted": payload.deleted,
     }
     return response_object

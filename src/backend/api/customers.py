@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from crud import crud
 from api.model import Customer, CustomerDB
 from uuid import UUID
+from api.check_req_type import allow_get_only
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(allow_get_only)])
 
 @router.post("/customers/", response_model=CustomerDB, status_code=201)
 async def create_customer(payload: Customer):

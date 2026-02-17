@@ -1,7 +1,7 @@
 from api.model import Employee, SiteConfig, Address, Customer, Order, Product, Route, Category, Invoice, Cart, Role, Sector
 from db.session import session
 from fastapi import HTTPException
-from db.model import Employee, SiteConfig, Address, Customer, Order, Product, Route, Category, Invoice, Cart, Role, Sector, categoriesProducts, ordersProducts, routesOrders, cartsProducts
+from db.model import Employee, SiteConfig, Address, Customer, Order, Product, Route, Category, Invoice, Cart, Role, Sector, categoriesProducts, ordersProducts, routesOrders, cartsProducts, Role
 from sqlalchemy import select, delete
 from uuid import UUID
 from datetime import datetime
@@ -666,3 +666,38 @@ def delete_cartsProductss():
     session.commit()
     return True
     
+
+## ROLE
+
+def delete_roles():
+    roles = session.query(Role).all()
+    for role in roles:
+        session.delete(role)
+    session.commit()
+    return True
+
+def get_roles():
+    roles = session.query(Role).all()
+    return roles
+
+def get_role(role_id: UUID):
+    role = session.query(Role).filter(Role.roleId == role_id).first()
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+    return role
+
+def create_role(payload: Role):
+    role = Role(
+        name=payload.name,
+        description=payload.description,
+        deleted=payload.deleted
+    )
+    session.add(role)
+    session.commit()
+    return role.roleId
+
+def get_role_by_name(name: str):
+    role = session.query(Role).filter(Role.name == name).first()
+    if not role:
+        raise HTTPException(status_code=404, detail="Role not found")
+    return role

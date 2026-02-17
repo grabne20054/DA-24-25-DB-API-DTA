@@ -1,10 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
 from crud import crud
 from api.model import Category, CategoryDB
 from uuid import UUID
+from api.check_req_type import allow_get_only
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(allow_get_only)])
 
 @router.post("/categories/", response_model=CategoryDB, status_code=201)
 async def create_category(payload: Category):

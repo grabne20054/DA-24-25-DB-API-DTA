@@ -75,7 +75,7 @@ class Employee(Base):
     lastName: Mapped[str] = mapped_column(String(255),nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    role: Mapped[Role]
+    roleId: Mapped[UUID] = mapped_column(ForeignKey("roles.id"), nullable=False)
     deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
@@ -93,7 +93,7 @@ class SiteConfig(Base):
     addressId: Mapped[int] = mapped_column(ForeignKey("addresses.addressId"), nullable=False)
 
     modifiedAt: Mapped[datetime] = mapped_column(DateTime, default=None, nullable=True)
-    deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    #deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
     address: Mapped["Address"] = relationship("Address", back_populates="siteConfig")
 
@@ -127,7 +127,6 @@ class Customer(Base):
     signedUp: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now())
     avatarPath: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    role: Mapped[Role]
     businessSector: Mapped[Sector]
     modifiedAt: Mapped[datetime] = mapped_column(DateTime, default=None, nullable=True)
     deleted: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -210,4 +209,12 @@ class Invoice(Base):
     deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     order: Mapped["Order"] = relationship("Order", back_populates="invoice")
 
-Base.metadata.create_all(engine)
+class Role(Base):
+    __tablename__ = "roles"
+
+    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, unique=True, nullable=False, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+
+#Base.metadata.create_all(engine)
