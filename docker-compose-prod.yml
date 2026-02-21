@@ -10,5 +10,6 @@ services:
     ports:
       - 8002:8000
     environment:
-      - DATABASE_URL=postgresql://postgres:5hr4XAWBc0TZY1znwPkKVJPjJW1be6mGu56L614k5HH5SKAg0Q7Er8Qq2HPr2OMl@194.118.246.247:9999/postgres
+      - DATABASE_URL=postgresql://neondb_owner:npg_a2fYIQdGgi9x@ep-sparkling-tooth-ahiq4zef-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+
  
