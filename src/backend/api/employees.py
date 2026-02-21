@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from api.auth import is_token_valid
 from typing import Annotated
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(allow_get_only)])
 
 @router.post("/employees/", response_model=EmployeeDB, status_code=201)
 async def create_employee(token: Annotated[str, Depends(is_token_valid)], payload: Employee, db: Session = Depends(get_db)):
