@@ -333,7 +333,7 @@ def create_employee(payload: Employee, db: Session):
         lastName=payload.lastName,
         email=payload.email,
         password=payload.password,
-        role=payload.role,
+        roleId=payload.roleId,
     )
     db.add(employee)
     db.commit()
