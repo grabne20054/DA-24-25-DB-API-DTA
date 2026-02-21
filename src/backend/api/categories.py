@@ -4,12 +4,14 @@ from crud import crud
 from api.model import Category, CategoryDB
 from uuid import UUID
 from api.check_req_type import allow_get_only
+from api.dependencies import get_db
+from sqlalchemy.orm import Session
 
 router = APIRouter(dependencies=[Depends(allow_get_only)])
 
 @router.post("/categories/", response_model=CategoryDB, status_code=201)
-async def create_category(payload: Category):
-    category_id = crud.create_category(payload)
+async def create_category(payload: Category, db: Session = Depends(get_db)):
+    category_id = crud.create_category(payload, db)
 
     response_object = {
         "categoryId": category_id,
@@ -21,21 +23,21 @@ async def create_category(payload: Category):
 
 
 @router.get("/categories/{category_id}/", response_model=CategoryDB, status_code=200)
-async def read_category(category_id: UUID):
-    category = crud.get_category(category_id)
+async def read_category(category_id: UUID, db: Session = Depends(get_db)):
+    category = crud.get_category(category_id, db)
     return category
 
 @router.delete("/categories/{category_id}/", status_code=200)
-async def delete_category(category_id: UUID):
-    category = crud.delete_category(category_id)
+async def delete_category(category_id: UUID, db: Session = Depends(get_db)):
+    category = crud.delete_category(category_id, db)
     return category
 
 @router.get("/categories/", status_code=200)
-async def read_categories():
-    categories = crud.get_categories()
+async def read_categories(db: Session = Depends(get_db)):
+    categories = crud.get_categories(db)
     return categories
 
 @router.delete("/categories/", status_code=200)
-async def delete_categories():
-    crud.delete_categories()
+async def delete_categories(db: Session = Depends(get_db)):
+    crud.delete_categories(db)
     return True

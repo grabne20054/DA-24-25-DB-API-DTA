@@ -1,75 +1,75 @@
 from api.model import Employee, SiteConfig, Address, Customer, Order, Product, Route, Category, Invoice, Cart, Role, Sector
-from db.session import session
 from fastapi import HTTPException
 from db.model import Employee, SiteConfig, Address, Customer, Order, Product, Route, Category, Invoice, Cart, Role, Sector, categoriesProducts, ordersProducts, routesOrders, cartsProducts, Role
 from sqlalchemy import select, delete
 from uuid import UUID
 from datetime import datetime
+from sqlalchemy.orm import Session
 
 # GET PER ID
-def get_employee(employee_id: UUID):
-    employee = session.query(Employee).filter(Employee.employeeId == employee_id).first()
+def get_employee(employee_id: UUID, db: Session):
+    employee = db.query(Employee).filter(Employee.employeeId == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     return employee
 
-def get_site_config(site_config_id: UUID):
-    site_config = session.query(SiteConfig).filter(SiteConfig.siteConfigId == site_config_id).first()
+def get_site_config(site_config_id: UUID, db: Session):
+    site_config = db.query(SiteConfig).filter(SiteConfig.siteConfigId == site_config_id).first()
     if not site_config:
         raise HTTPException(status_code=404, detail="Site config not found")
     return site_config
 
-def get_address(address_id: UUID):
-    address = session.query(Address).filter(Address.addressId == address_id).first()
+def get_address(address_id: UUID, db: Session):
+    address = db.query(Address).filter(Address.addressId == address_id).first()
     if not address:
         raise HTTPException(status_code=404, detail="Address not found")
     return address
 
-def get_customer(customer_id: UUID):
-    customer = session.query(Customer).filter(Customer.customerId == customer_id).first()
+def get_customer(customer_id: UUID, db: Session):
+    customer = db.query(Customer).filter(Customer.customerId == customer_id).first()
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
     return customer
 
-def get_order(order_id: UUID):
-    order = session.query(Order).filter(Order.orderId == order_id).first()
+def get_order(order_id: UUID, db: Session):
+    order = db.query(Order).filter(Order.orderId == order_id).first()
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order
 
-def get_product(product_id: UUID):
-    product = session.query(Product).filter(Product.productId == product_id).first()
+def get_product(product_id: UUID, db: Session):
+    product = db.query(Product).filter(Product.productId == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
-def get_route(route_id: UUID):
-    route = session.query(Route).filter(Route.routeId == route_id).first()
+def get_route(route_id: UUID, db: Session):
+    route = db.query(Route).filter(Route.routeId == route_id).first()
     if not route:
         raise HTTPException(status_code=404, detail="Route not found")
     return route
 
-def get_category(category_id: UUID):
-    category = session.query(Category).filter(Category.categoryId == category_id).first()
+def get_category(category_id: UUID, db: Session):
+    category = db.query(Category).filter(Category.categoryId == category_id).first()
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
     return category
 
-def get_invoice(invoice_id: UUID):
-    invoice = session.query(Invoice).filter(Invoice.invoiceId == invoice_id).first()
+def get_invoice(invoice_id: UUID, db: Session):
+    invoice = db.query(Invoice).filter(Invoice.invoiceId == invoice_id).first()
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
     return invoice
 
-def get_cart(cart_id: UUID):
-    cart = session.query(Cart).filter(Cart.cartId == cart_id).first()
+def get_cart(cart_id: UUID, db: Session):
+    cart = db.query(Cart).filter(Cart.cartId == cart_id).first()
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
     return cart
 
-def get_categoriesProducts(categoryId: UUID, productId: UUID):
+def get_categoriesProducts(categoryId: UUID, productId: UUID, db: Session):
     categories = (
-        session.query(Category)
+        db.query(Category)
         .join(
             categoriesProducts,
             Category.categoryId == categoriesProducts.c.categoryId
@@ -84,9 +84,9 @@ def get_categoriesProducts(categoryId: UUID, productId: UUID):
     else:
         raise HTTPException(status_code=404, detail="Category or Product not found")
     
-def get_cartsProducts(cartId: UUID, productId: UUID):
+def get_cartsProducts(cartId: UUID, productId: UUID, db: Session):
     carts = (
-        session.query(Cart)
+        db.query(Cart)
         .join(
             cartsProducts,
             Cart.cartId == cartsProducts.c.cartId
@@ -101,9 +101,9 @@ def get_cartsProducts(cartId: UUID, productId: UUID):
     else:
         raise HTTPException(status_code=404, detail="Cart or Product not found")
 
-def get_ordersProducts(orderId: UUID, productId: UUID):
+def get_ordersProducts(orderId: UUID, productId: UUID, db: Session):
     orders = (
-        session.query(Order)
+        db.query(Order)
         .join(
             ordersProducts,
             Order.orderId == ordersProducts.c.orderId
@@ -118,9 +118,9 @@ def get_ordersProducts(orderId: UUID, productId: UUID):
     else:
         raise HTTPException(status_code=404, detail="Order or Product not found")
     
-def get_routesOrders(routeId: UUID, orderId: UUID):
+def get_routesOrders(routeId: UUID, orderId: UUID, db: Session):
     routes = (
-        session.query(Route)
+        db.query(Route)
         .join(
             routesOrders,
             Route.routeId == routesOrders.c.routeId
@@ -136,125 +136,125 @@ def get_routesOrders(routeId: UUID, orderId: UUID):
         raise HTTPException(status_code=404, detail="Route or Order not found")    
     
 
-def get_categoriesProducts_by_categoryId(categoryId: UUID):
+def get_categoriesProducts_by_categoryId(categoryId: UUID, db: Session):
     products = (
-        session.query(Product)
+        db.query(Product)
         .filter(Product.productId.in_(
-            session.query(categoriesProducts.c.productId)
+            db.query(categoriesProducts.c.productId)
             .filter(categoriesProducts.c.categoryId == categoryId)
         ))
         .all()
     )
 
-    if session.query(Category).filter(Category.categoryId == categoryId).first() is None:
+    if db.query(Category).filter(Category.categoryId == categoryId).first() is None:
         raise HTTPException(status_code=404, detail="Category not found")
     if not products:
         raise HTTPException(status_code=404, detail="Product not found")
     return products
-    
-def get_categoriesProducts_by_productId(productId: UUID):
+
+def get_categoriesProducts_by_productId(productId: UUID, db: Session):
     categories = (
-        session.query(Category)
+        db.query(Category)
         .filter(Category.categoryId.in_(
-            session.query(categoriesProducts.c.categoryId)
+            db.query(categoriesProducts.c.categoryId)
             .filter(categoriesProducts.c.productId == productId)
         ))
         .all()
     )
-    if session.query(Product).filter(Product.productId == productId).first() is None:
+    if db.query(Product).filter(Product.productId == productId).first() is None:
         raise HTTPException(status_code=404, detail="Product not found")
     if not categories:
         raise HTTPException(status_code=404, detail="Category not found")
     return categories
 
-def get_cartsProducts_by_cartId(cartId: UUID):
+def get_cartsProducts_by_cartId(cartId: UUID, db: Session):
     products = (
-        session.query(Product)
+        db.query(Product)
         .filter(Product.productId.in_(
-            session.query(cartsProducts.c.productId)
+            db.query(cartsProducts.c.productId)
             .filter(cartsProducts.c.cartId == cartId)
         ))
         .all()
     )
 
-    if session.query(Cart).filter(Cart.cartId == cartId).first() is None:
+    if db.query(Cart).filter(Cart.cartId == cartId).first() is None:
         raise HTTPException(status_code=404, detail="Cart not found")
     if not products:
         raise HTTPException(status_code=404, detail="Product not found")
     return products
 
-def get_cartsProducts_by_productId(productId: UUID):
+def get_cartsProducts_by_productId(productId: UUID, db: Session):
     carts = (
-        session.query(Cart)
+        db.query(Cart)
         .filter(Cart.cartId.in_(
-            session.query(cartsProducts.c.cartId)
+            db.query(cartsProducts.c.cartId)
             .filter(cartsProducts.c.productId == productId)
         ))
         .all()
     )
-    if session.query(Product).filter(Product.productId == productId).first() is None:
+    if db.query(Product).filter(Product.productId == productId).first() is None:
         raise HTTPException(status_code=404, detail="Product not found")
     if not carts:
         raise HTTPException(status_code=404, detail="Cart not found")
     return carts
 
-def get_ordersProducts_by_orderId(orderId: UUID):
+def get_ordersProducts_by_orderId(orderId: UUID, db: Session):
     products = (
-        session.query(Product)
+        db.query(Product)
         .filter(Product.productId.in_(
-            session.query(ordersProducts.c.productId)
+            db.query(ordersProducts.c.productId)
             .filter(ordersProducts.c.orderId == orderId)
         ))
         .all()
     )
 
-    if session.query(Order).filter(Order.orderId == orderId).first() is None:
+    if db.query(Order).filter(Order.orderId == orderId).first() is None:
         raise HTTPException(status_code=404, detail="Order not found")
     if not products:
         raise HTTPException(status_code=404, detail="Product not found")
     return products
 
-def get_ordersProducts_by_productId(productId: UUID):
+def get_ordersProducts_by_productId(productId: UUID, db: Session):
     orders = (
-        session.query(Order)
+        db.query(Order)
         .filter(Order.orderId.in_(
-            session.query(ordersProducts.c.orderId)
+            db.query(ordersProducts.c.orderId)
             .filter(ordersProducts.c.productId == productId)
         ))
         .all()
     )
-    if session.query(Product).filter(Product.productId == productId).first() is None:
+    if db.query(Product).filter(Product.productId == productId).first() is None:
         raise HTTPException(status_code=404, detail="Product not found")
     if not orders:
         raise HTTPException(status_code=404, detail="Order not found")
     return orders
 
-def get_routesOrders_by_routeId(routeId: UUID):
+def get_routesOrders_by_routeId(routeId: UUID, db: Session):
     orders = (
-        session.query(Order)
+        db.query(Order)
         .filter(Order.orderId.in_(
-            session.query(routesOrders.c.orderId)
+            db.query(routesOrders.c.orderId)
             .filter(routesOrders.c.routeId == routeId)
         ))
         .all()
     )
 
-    if session.query(Route).filter(Route.routeId == routeId).first() is None:
+    if db.query(Route).filter(Route.routeId == routeId).first() is None:
         raise HTTPException(status_code=404, detail="Route not found")
     if not orders:
         raise HTTPException(status_code=404, detail="Order not found")
     return orders
 
-def get_routesOrders_by_orderId(orderId: UUID):
+def get_routesOrders_by_orderId(orderId: UUID, db: Session):
     routes = (
-        session.query(Route)
+        db.query(Route)
         .filter(Route.routeId.in_(
-            session.query(routesOrders.c.routeId)
+            db.query(routesOrders.c.routeId)
             .filter(routesOrders.c.orderId == orderId)
         ))
         .all()
     )
-    if session.query(Order).filter(Order.orderId == orderId).first() is None:
+    if db.query(Order).filter(Order.orderId == orderId).first() is None:
         raise HTTPException(status_code=404, detail="Order not found")
     if not routes:
         raise HTTPException(status_code=404, detail="Route not found")
@@ -264,68 +264,70 @@ def get_routesOrders_by_orderId(orderId: UUID):
 
 
 # GET ALL
-def get_employees(email:str, password:str):
+def get_employees(email:str, password:str, db: Session):
     if email is not None and password is not None:
-        employees = session.query(Employee).filter(Employee.email == email, Employee.password == password).all()
+        employees = db.query(Employee).filter(Employee.email == email, Employee.password == password).all()
+    elif email is not None and password is None:
+        employees = db.query(Employee).filter(Employee.email == email).first()
     else: 
-        employees = session.query(Employee).all()
+        employees = db.query(Employee).all()
     return employees
 
-def get_site_configs():
-    site_configs = session.query(SiteConfig).all()
+def get_site_configs(db: Session):
+    site_configs = db.query(SiteConfig).all()
     return site_configs
 
-def get_addresses():
-    addresses = session.query(Address).all()
+def get_addresses(db: Session):
+    addresses = db.query(Address).all()
     return addresses
 
-def get_customers():
-    customers = session.query(Customer).all()
+def get_customers(db: Session):
+    customers = db.query(Customer).all()
     return customers
 
-def get_orders():
-    orders = session.query(Order).all()
+def get_orders(db: Session):
+    orders = db.query(Order).all()
     return orders
 
-def get_products():
-    products = session.query(Product).all()
+def get_products(db: Session):
+    products = db.query(Product).all()
     return products
 
-def get_routes():
-    routes = session.query(Route).all()
+def get_routes(db: Session):
+    routes = db.query(Route).all()
     return routes
 
-def get_categories():
-    categories = session.query(Category).all()
+def get_categories(db: Session):
+    categories = db.query(Category).all()
     return categories
 
-def get_invoices():
-    invoices = session.query(Invoice).all()
+def get_invoices(db: Session):
+    invoices = db.query(Invoice).all()
     return invoices
 
-def get_carts():
-    carts = session.query(Cart).all()
+def get_carts(db: Session):
+    carts = db.query(Cart).all()
     return carts
 
 
-def get_categoriesProductss():
-    return session.execute(select(categoriesProducts)).mappings().all()
+def get_categoriesProductss(db: Session):
+    return db.execute(select(categoriesProducts)).mappings().all()
 
-def get_cartsProductss():
-    return session.execute(select(cartsProducts)).mappings().all()
+def get_cartsProductss(db: Session):
+    return db.execute(select(cartsProducts)).mappings().all()
 
-def get_ordersProductss():
-    return session.execute(select(ordersProducts)).mappings().all()
-
-
+def get_ordersProductss(db: Session):
+    return db.execute(select(ordersProducts)).mappings().all()
 
 
-def get_routesOrderss():
-    return session.execute(select(routesOrders)).mappings().all()
+
+
+def get_routesOrderss(db: Session):
+    return db.execute(select(routesOrders)).mappings().all()
 
 
 # POST (JUST FOR MOCKUP)
-def create_employee(payload: Employee):
+def create_employee(payload: Employee, db: Session):
     employee = Employee(
         firstName=payload.firstName,
         lastName=payload.lastName,
@@ -333,11 +335,11 @@ def create_employee(payload: Employee):
         password=payload.password,
         role=payload.role,
     )
-    session.add(employee)
-    session.commit()
+    db.add(employee)
+    db.commit()
     return employee.employeeId
 
-def create_site_config(payload: SiteConfig):
+def create_site_config(payload: SiteConfig, db: Session):
     site_config = SiteConfig(
         companyName=payload.companyName,
         logoPath=payload.logoPath,
@@ -347,11 +349,11 @@ def create_site_config(payload: SiteConfig):
         iban=payload.iban,
         addressId=payload.addressId
     )
-    session.add(site_config)
-    session.commit()
+    db.add(site_config)
+    db.commit()
     return site_config.siteConfigId
 
-def create_address(payload: Address):
+def create_address(payload: Address, db: Session):
     address = Address(
         streetName=payload.streetName,
         streetNumber=payload.streetNumber,
@@ -359,11 +361,11 @@ def create_address(payload: Address):
         postCode=payload.postCode,
         country=payload.country,
         state=payload.state)
-    session.add(address)
-    session.commit()
+    db.add(address)
+    db.commit()
     return address.addressId
 
-def create_customer(payload: Customer):
+def create_customer(payload: Customer, db: Session):
     customer = Customer(
         firstName=payload.firstName,
         lastName=payload.lastName,
@@ -377,23 +379,23 @@ def create_customer(payload: Customer):
         businessSector=payload.businessSector,
         avatarPath=payload.avatarPath,
         addressId=payload.addressId)
-    
-    session.add(customer)
-    session.commit()
+
+    db.add(customer)
+    db.commit()
     return customer.customerId
 
-def create_order(payload: Order):
+def create_order(payload: Order, db: Session):
     order = Order(
         orderDate=payload.orderDate,
         deliveryDate=payload.deliveryDate,
         customerReference=payload.customerReference,
         orderState=payload.orderState,
         selfCollect=payload.selfCollect,)
-    session.add(order)
-    session.commit()
+    db.add(order)
+    db.commit()
     return order.orderId
 
-def create_product(payload: Product):
+def create_product(payload: Product, db: Session):
     product = Product(
         name=payload.name,
         description=payload.description,
@@ -402,95 +404,95 @@ def create_product(payload: Product):
         imagePath=payload.imagePath,
         createdAt=payload.createdAt
         )
-    session.add(product)
-    session.commit()
+    db.add(product)
+    db.commit()
     return product.productId
 
-def create_route(payload: Route):
+def create_route(payload: Route, db: Session):
     route = Route(
         name=payload.name,
     )
-    session.add(route)
-    session.commit()
+    db.add(route)
+    db.commit()
     return route.routeId
 
-def create_category(payload: Category):
+def create_category(payload: Category, db: Session):
     category = Category(
         name=payload.name,
         imagePath=payload.imagePath
     )
-    session.add(category)
-    session.commit()
+    db.add(category)
+    db.commit()
     return category.categoryId
 
-def create_cart(payload: Cart):
+def create_cart(payload: Cart, db: Session):
     cart = Cart(
         customerReference=payload.customerReference,
     )
-    session.add(cart)
-    session.commit()
+    db.add(cart)
+    db.commit()
     return cart.cartId
 
-def create_invoice(payload: Invoice):
+def create_invoice(payload: Invoice, db: Session):
     invoice = Invoice(
         orderId=payload.orderId,
         invoiceAmount=payload.invoiceAmount,
         paymentDate=payload.paymentDate,
         pdfUrl=payload.pdfUrl
     )
-    session.add(invoice)
-    session.commit()
+    db.add(invoice)
+    db.commit()
     return invoice.invoiceId
 
-def create_categoriesProducts(categoryId: UUID, productId: UUID):
+def create_categoriesProducts(categoryId: UUID, productId: UUID, db: Session):
     already_in_category = (
-        session.query(categoriesProducts).filter_by(categoryId=categoryId, productId=productId).first()
+        db.query(categoriesProducts).filter_by(categoryId=categoryId, productId=productId).first()
     )
 
     if already_in_category:
         raise HTTPException(status_code=400, detail="Already in category")
-    
-    procuct_exists = session.query(Product).filter(Product.productId == productId).first()
-    category_exists = session.query(Category).filter(Category.categoryId == categoryId).first()
 
-    if procuct_exists and category_exists:
-        session.execute(categoriesProducts.insert().values(categoryId=categoryId, productId=productId))
-        session.commit()
+    product_exists = db.query(Product).filter(Product.productId == productId).first()
+    category_exists = db.query(Category).filter(Category.categoryId == categoryId).first()
+
+    if product_exists and category_exists:
+        db.execute(categoriesProducts.insert().values(categoryId=categoryId, productId=productId))
+        db.commit()
         return productId, categoryId
     else:
         raise HTTPException(status_code=404, detail="Product or category not found")
-    
-def create_ordersProducts(productId: UUID, orderId: UUID, productAmount: int, orderDate: datetime): 
-    product_exists = session.query(Product).filter(Product.productId == productId).first()
-    order_exists = session.query(Order).filter(Order.orderId == orderId).first()
+
+def create_ordersProducts(productId: UUID, orderId: UUID, productAmount: int, orderDate: datetime, db: Session): 
+    product_exists = db.query(Product).filter(Product.productId == productId).first()
+    order_exists = db.query(Order).filter(Order.orderId == orderId).first()
 
     if product_exists and order_exists:
-        session.execute(ordersProducts.insert().values(productId=productId, orderId=orderId, productAmount=productAmount, orderDate=orderDate))
-        session.commit()
+        db.execute(ordersProducts.insert().values(productId=productId, orderId=orderId, productAmount=productAmount, orderDate=orderDate))
+        db.commit()
         return productId, orderId, productAmount, orderDate
     else:
         raise HTTPException(status_code=404, detail="Product or order not found")
 
-def create_routesOrders(routeId: UUID, orderId: UUID):
-        
-        route_exists = session.query(Route).filter(Route.routeId == routeId).first()
-        order_exists = session.query(Order).filter(Order.orderId == orderId).first()
-    
+def create_routesOrders(routeId: UUID, orderId: UUID, db: Session):
+
+        route_exists = db.query(Route).filter(Route.routeId == routeId).first()
+        order_exists = db.query(Order).filter(Order.orderId == orderId).first()
+
         if route_exists and order_exists:
-            session.execute(routesOrders.insert().values(routeId=routeId, orderId=orderId))
-            session.commit()
+            db.execute(routesOrders.insert().values(routeId=routeId, orderId=orderId))
+            db.commit()
             return routeId, orderId
         else:
             raise HTTPException(status_code=404, detail="Route or order not found")
 
-def create_cartsProducts(productId: UUID, cartId: UUID, productAmount: int):
-            
-        procuct_exists = session.query(Product).filter(Product.productId == productId).first()
-        cart_exists = session.query(Cart).filter(Cart.cartId == cartId).first()
-    
-        if procuct_exists and cart_exists:
-            session.execute(cartsProducts.insert().values(productId=productId, cartId=cartId, productAmount=productAmount))
-            session.commit()
+def create_cartsProducts(productId: UUID, cartId: UUID, productAmount: int, db: Session):
+
+        product_exists = db.query(Product).filter(Product.productId == productId).first()
+        cart_exists = db.query(Cart).filter(Cart.cartId == cartId).first()
+
+        if product_exists and cart_exists:
+            db.execute(cartsProducts.insert().values(productId=productId, cartId=cartId, productAmount=productAmount))
+            db.commit()
             return productId, cartId, productAmount
         else:
             raise HTTPException(status_code=404, detail="Product or cart not found")
@@ -499,205 +501,205 @@ def create_cartsProducts(productId: UUID, cartId: UUID, productAmount: int):
 
 # DELETE BY ID
 
-def delete_employee(employee_id: UUID):
-    employee = session.query(Employee).filter(Employee.employeeId == employee_id).first()
+def delete_employee(employee_id: UUID, db: Session):
+    employee = db.query(Employee).filter(Employee.employeeId == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
-    session.delete(employee)
-    session.commit()
+    db.delete(employee)
+    db.commit()
     return employee_id
 
-def delete_site_config(config_id: UUID):
-    site_config = session.query(SiteConfig).filter(SiteConfig.configId == config_id).first()
+def delete_site_config(config_id: UUID, db: Session):
+    site_config = db.query(SiteConfig).filter(SiteConfig.configId == config_id).first()
     if not site_config:
         raise HTTPException(status_code=404, detail="Site config not found")
-    session.delete(site_config)
-    session.commit()
+    db.delete(site_config)
+    db.commit()
     return config_id
 
-def delete_address(address_id: UUID):
-    address = session.query(Address).filter(Address.addressId == address_id).first()
+def delete_address(address_id: UUID, db: Session):
+    address = db.query(Address).filter(Address.addressId == address_id).first()
     if not address:
         raise HTTPException(status_code=404, detail="Address not found")
-    session.delete(address)
-    session.commit()
+    db.delete(address)
+    db.commit()
     return address_id
 
-def delete_customer(customer_id: UUID):
-    customer = session.query(Customer).filter(Customer.customerId == customer_id).first()
+def delete_customer(customer_id: UUID, db: Session):
+    customer = db.query(Customer).filter(Customer.customerId == customer_id).first()
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
-    session.delete(customer)
-    session.commit()
+    db.delete(customer)
+    db.commit()
     return customer_id
 
-def delete_order(order_id: UUID):
-    order = session.query(Order).filter(Order.orderId == order_id).first()
+def delete_order(order_id: UUID, db: Session):
+    order = db.query(Order).filter(Order.orderId == order_id).first()
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
-    session.delete(order)
-    session.commit()
+    db.delete(order)
+    db.commit()
     return order_id
 
-def delete_product(product_id: UUID):
-    product = session.query(Product).filter(Product.productId == product_id).first()
+def delete_product(product_id: UUID, db: Session):
+    product = db.query(Product).filter(Product.productId == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    session.delete(product)
-    session.commit()
+    db.delete(product)
+    db.commit()
     return product_id
 
-def delete_route(route_id: UUID):
-    route = session.query(Route).filter(Route.routeId == route_id).first()
+def delete_route(route_id: UUID, db: Session):
+    route = db.query(Route).filter(Route.routeId == route_id).first()
     if not route:
         raise HTTPException(status_code=404, detail="Route not found")
-    session.delete(route)
-    session.commit()
+    db.delete(route)
+    db.commit()
     return route_id
 
-def delete_category(category_id: UUID):
-    category = session.query(Category).filter(Category.categoryId == category_id).first()
+def delete_category(category_id: UUID, db: Session):
+    category = db.query(Category).filter(Category.categoryId == category_id).first()
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
-    session.delete(category)
-    session.commit()
+    db.delete(category)
+    db.commit()
     return category_id
 
-def delete_invoice(invoice_id: UUID):
-    invoice = session.query(Invoice).filter(Invoice.invoiceId == invoice_id).first()
+def delete_invoice(invoice_id: UUID, db: Session):
+    invoice = db.query(Invoice).filter(Invoice.invoiceId == invoice_id).first()
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
-    session.delete(invoice)
-    session.commit()
+    db.delete(invoice)
+    db.commit()
     return invoice_id
 
-def delete_cart(cart_id: UUID):
-    cart = session.query(Cart).filter(Cart.cartId == cart_id).first()
+def delete_cart(cart_id: UUID, db: Session):
+    cart = db.query(Cart).filter(Cart.cartId == cart_id).first()
     if not cart:
         raise HTTPException(status_code=404, detail="Cart not found")
-    session.delete(cart)
-    session.commit()
+    db.delete(cart)
+    db.commit()
     return cart_id
 
 # DELETE ALL
-def delete_employees():
-    employees = session.query(Employee).all()
+def delete_employees(db: Session):
+    employees = db.query(Employee).all()
     for employee in employees:
-        session.delete(employee)
-    session.commit()
+        db.delete(employee)
+    db.commit()
     return True
 
-def delete_site_configs():
-    site_configs = session.query(SiteConfig).all()
+def delete_site_configs(db: Session):
+    site_configs = db.query(SiteConfig).all()
     for site_config in site_configs:
-        session.delete(site_config)
-    session.commit()
+        db.delete(site_config)
+    db.commit()
     return True
 
-def delete_addresses():
-    addresses = session.query(Address).all()
+def delete_addresses(db: Session):
+    addresses = db.query(Address).all()
     for address in addresses:
-        session.delete(address)
-    session.commit()
+        db.delete(address)
+    db.commit()
     return True
 
-def delete_customers():
-    customers = session.query(Customer).all()
+def delete_customers(db: Session):
+    customers = db.query(Customer).all()
     for customer in customers:
-        session.delete(customer)
-    session.commit()
+        db.delete(customer)
+    db.commit()
     return True
 
-def delete_orders():
-    orders = session.query(Order).all()
+def delete_orders(db: Session):
+    orders = db.query(Order).all()
     for order in orders:
-        session.delete(order)
-    session.commit()
+        db.delete(order)
+    db.commit()
     return True
 
-def delete_products():
-    products = session.query(Product).all()
+def delete_products(db: Session):
+    products = db.query(Product).all()
     for product in products:
-        session.delete(product)
-    session.commit()
+        db.delete(product)
+    db.commit()
     return True
 
-def delete_routes():
-    routes = session.query(Route).all()
+def delete_routes(db: Session):
+    routes = db.query(Route).all()
     for route in routes:
-        session.delete(route)
-    session.commit()
+        db.delete(route)
+    db.commit()
     return True
 
-def delete_categories():
-    categories = session.query(Category).all()
+def delete_categories(db: Session):
+    categories = db.query(Category).all()
     for category in categories:
-        session.delete(category)
-    session.commit()
+        db.delete(category)
+    db.commit()
     return True
 
-def delete_invoices():
-    invoices = session.query(Invoice).all()
+def delete_invoices(db: Session):
+    invoices = db.query(Invoice).all()
     for invoice in invoices:
-        session.delete(invoice)
-    session.commit()
+        db.delete(invoice)
+    db.commit()
     return True
 
-def delete_carts():
-    carts = session.query(Cart).all()
+def delete_carts(db: Session):
+    carts = db.query(Cart).all()
     for cart in carts:
-        session.delete(cart)
-    session.commit()
+        db.delete(cart)
+    db.commit()
     return True
 
 
-def delete_ordersProductss():
-    session.execute(delete(ordersProducts))
-    session.commit()
+def delete_ordersProducts(db: Session):
+    db.execute(delete(ordersProducts))
+    db.commit()
     return True
 
-def delete_categoriesProductss():
-    session.execute(delete(categoriesProducts))
-    session.commit()
+def delete_categoriesProducts(db: Session):
+    db.execute(delete(categoriesProducts))
+    db.commit()
     return True
 
-def delete_cartsProductss():
-    session.execute(delete(cartsProducts))
-    session.commit()
+def delete_cartsProducts(db: Session):
+    db.execute(delete(cartsProducts))
+    db.commit()
     return True
     
 
 ## ROLE
 
-def delete_roles():
-    roles = session.query(Role).all()
+def delete_roles(db: Session):
+    roles = db.query(Role).all()
     for role in roles:
-        session.delete(role)
-    session.commit()
+        db.delete(role)
+    db.commit()
     return True
 
-def get_roles():
-    roles = session.query(Role).all()
+def get_roles(db: Session):
+    roles = db.query(Role).all()
     return roles
 
-def get_role(role_id: UUID):
-    role = session.query(Role).filter(Role.roleId == role_id).first()
+def get_role(role_id: UUID, db: Session):
+    role = db.query(Role).filter(Role.roleId == role_id).first()
     if not role:
         raise HTTPException(status_code=404, detail="Role not found")
     return role
 
-def create_role(payload: Role):
+def create_role(payload: Role, db: Session):
     role = Role(
         name=payload.name,
         description=payload.description,
         deleted=payload.deleted
     )
-    session.add(role)
-    session.commit()
+    db.add(role)
+    db.commit()
     return role.roleId
 
-def get_role_by_name(name: str):
-    role = session.query(Role).filter(Role.name == name).first()
+def get_role_by_name(name: str, db: Session):
+    role = db.query(Role).filter(Role.name == name).first()
     if not role:
         raise HTTPException(status_code=404, detail="Role not found")
     return role
