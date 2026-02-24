@@ -25,7 +25,7 @@ class Sector(str, pyenum):
     MANUFACTURING = "manufacturing"
     OTHER = "other"
     RETAIL = "retail"
-    TECHONOLOGY = "technology"
+    TECHNOLOGY = "technology"
     TOURISM = "tourism"
     TRANSPORTATION = "transportation"
 
